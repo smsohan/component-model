@@ -54,6 +54,9 @@ def mk_tup(*a):
     return x
   return { str(i):mk_tup_rec(v) for i,v in enumerate(a) }
 
+def mk_own(r, rt):
+  return OwnHandle(r, rt, 0, 0, None)
+
 def fail(msg):
   raise BaseException(msg)
 
@@ -397,7 +400,7 @@ def test_handles():
     assert(len(args) == 2)
     assert(args[0].resource is r1)
     assert(args[1].resource is r3)
-    return ([OwnHandle(Resource(45, inst), rt, 0)], lambda:())
+    return ([mk_own(Resource(45, inst), rt)], lambda:())
 
   def core_wasm(args):
     nonlocal dtor_value
@@ -439,7 +442,7 @@ def test_handles():
     return [Value('i32', 0), Value('i32', 1), Value('i32', 3)]
 
   ft = FuncType([Own(rt),Own(rt),Borrow(rt)],[Own(rt),Own(rt),Own(rt)])
-  args = [OwnHandle(r1, rt, 0), OwnHandle(r2, rt, 0), OwnHandle(r3, rt, 0)]
+  args = [mk_own(r1, rt), mk_own(r2, rt), mk_own(r3, rt)]
   got,post_return = canon_lift(opts, inst, core_wasm, ft, args)
 
   assert(len(got) == 3)
